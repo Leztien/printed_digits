@@ -176,13 +176,15 @@ def get_character_matrix(character, resolution=28, margins=3, flatten=False, **k
     mx = crop_image_matrix(mx, **d)
     mx = rescale_image_matrix(mx, **d)
     
-    #if any(str(k).lower()[:3] in "rotang" for k in d.keys()):
-    
     angle = ([d.get(k,0) for k in d.keys() if str(k).lower()[:3] == "rot"] + [d.get('angle',0),])[0]
     if angle:
         d['angle'] = angle
         mx = rotate_image_matrix(mx, **d)
     mx = shift_image_matrix(mx, **d)
+    
+    #rescale into the [0,255] range    
+    mx = mx - mx.min()
+    mx = (mx * (255 / mx.max())).round().astype('uint8')
     return mx.flatten() if flatten else mx
 
 
